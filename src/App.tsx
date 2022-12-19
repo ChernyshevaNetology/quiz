@@ -1,6 +1,6 @@
 import React from "react";
-import { Quiz } from "components/Quiz";
+import { QuizPage } from "pages/Quiz-page";
 
-const App = () => <Quiz />;
+const App = () => <QuizPage />;
 
 export default App;

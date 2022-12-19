@@ -1,11 +1,14 @@
 interface IQuestion {
+  category: string;
+  correct_answer: string;
+  difficulty: string;
+  incorrect_answers: string[];
   question: string;
-  incorrectAnswers: string[];
-  correctAnswer: string;
+  type: string;
 }
 
-export const shuffleAnswers = (question: IQuestion) => {
-  const unshuffled = [question.correctAnswer, ...question.incorrectAnswers];
+export const shuffleAnswers = (question: IQuestion): string[] => {
+  const unshuffled = [question.correct_answer, ...question.incorrect_answers];
 
   return unshuffled
     .map((answer) => ({
@@ -13,20 +16,5 @@ export const shuffleAnswers = (question: IQuestion) => {
       value: answer,
     }))
     .sort((a, b) => a.sort - b.sort)
-    .map((el) => el.value);
-};
-
-export const normalizeQuestions = (questions: any) => {
-  console.log("questions", questions);
-  return questions.map((question: any) => {
-    console.log("question", question);
-    const incorrectAnswers = question.incorrect_answers.map(
-      (incorrectAnswer: string) => decodeURIComponent(incorrectAnswer)
-    );
-    return {
-      correctAnswer: decodeURIComponent(question.correct_answer),
-      question: decodeURIComponent(question.question),
-      incorrectAnswers,
-    };
-  });
+    .map((el) => decodeURIComponent(el.value));
 };

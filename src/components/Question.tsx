@@ -1,31 +1,21 @@
 import React, { useContext } from "react";
 import { QuizContext } from "../context/QuizContext";
-import { Answer } from "./Answer";
+import Alert from "@mui/material/Alert";
+import { Typography } from "@mui/material";
 
-const Question = () => {
-  // @ts-ignore
-  const [quizState, dispatch] = useContext(QuizContext);
-  const currentQuestion =
-    quizState.questions.length > 0
-      ? quizState.questions[quizState.currentQuestionIndex]
-      : {};
+type TQuestionProps = {
+  currentQuestionIndex: number;
+};
+
+const Question = ({ currentQuestionIndex }: TQuestionProps) => {
+  const value: any = useContext(QuizContext);
   return (
     <div>
-      <div className={"question"}>{currentQuestion.question}</div>
-      <div className={"answers"}>
-        {quizState.answers.map((answer: string, idx: number) => (
-          <Answer
-            key={idx}
-            index={idx}
-            answer={answer}
-            correctAnswer={currentQuestion.correctAnswer}
-            currentAnswer={quizState.currentAnswer}
-            onSelectAnswer={(answer: string) =>
-              dispatch({ type: "SELECT_ANSWER", payload: answer })
-            }
-          />
-        ))}
-      </div>
+      <Alert className={"question-info"} variant={"outlined"} severity="info">
+        <Typography className={"question-info"} variant={"h5"}>
+          {value[currentQuestionIndex]?.question}
+        </Typography>
+      </Alert>
     </div>
   );
 };
