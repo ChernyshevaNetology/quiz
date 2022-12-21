@@ -15,7 +15,6 @@ const Step = ({
   isAnswerCorrect,
   idx,
 }: TStepProps) => {
-  console.log("currentQuestionIdx", currentQuestionIndex, idx);
   const stepClasses = cn("step", {
     "current-step": currentQuestionIndex === idx,
     "right-answer": isAnswerCorrect,

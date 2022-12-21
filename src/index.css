@@ -10,7 +10,16 @@ div {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  margin: 0.5rem auto;
+  transition: 0.9s !important;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  margin: auto;
 }
 
 .quiz {
@@ -62,11 +71,21 @@ font-style: italic;
   margin-right: 20px;
 }
 
+.answer-letter__disabled {
+  background: #ccc !important;
+}
+
 .answer-item {
   margin: 10px;
   cursor: pointer;
 }
 
+.answer-wrong__highlight {
+  color: rgba(0, 0, 0, 0.26) !important;
+  box-shadow: none !important;
+  background-color: rgba(0, 0, 0, 0.12) !important;
+  cursor: default;
+}
 
 .score {
   display: flex;

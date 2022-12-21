@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Question } from "components/Question";
 import { Answer } from "components/Answer";
 import { QuizContext } from "context/QuizContext";
@@ -10,6 +10,7 @@ import { TSavedQuizData } from "types/types";
 import { Typography } from "@mui/material";
 import { AnswerResult } from "../components/AnswerResult";
 import Alert from "@mui/material/Alert";
+import { Timer } from "components/timer";
 
 const quizDataToSave = [...new Array(10)].map((_, idx) => ({
   question: null,
@@ -19,6 +20,8 @@ const quizDataToSave = [...new Array(10)].map((_, idx) => ({
   isAnswerCorrect: null,
 }));
 
+const timerLength = 5;
+
 const QuizPage = () => {
   const quiz: any = useContext(QuizContext);
 
@@ -26,14 +29,35 @@ const QuizPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<null | string>(null);
   const [savedQuizData, setSavedQuizData] =
     useState<TSavedQuizData[]>(quizDataToSave);
+  const [timer, setTimer] = useState(timerLength);
+  const isTimerStarted = useRef(false);
+  let id: any = useRef(null);
+  console.log("id", id);
+
+  useEffect(() => {
+    if (isTimerStarted.current) {
+      return;
+    }
+
+    if (timer === 0) {
+      clearInterval(id.current);
+      return;
+    }
+
+    id.current = setInterval(() => {
+      setTimer((c) => c - 1);
+    }, 1000);
+
+    return () => clearInterval(id.current);
+  }, [timer, isTimerStarted.current]);
 
   const onSelectNextQuestion = () => {
     const currentIdx =
       currentQuestionIndex >= quiz.length
         ? currentQuestionIndex
         : currentQuestionIndex + 1;
-
     setCurrentQuestionIndex(currentIdx);
+    setTimer(timerLength);
     const quizDataToUpdate = savedQuizData.map((data: TSavedQuizData) => {
       if (data.idx === currentQuestionIndex) {
         return {
@@ -54,13 +78,19 @@ const QuizPage = () => {
 
     setSavedQuizData(quizDataToUpdate);
     setSelectedAnswer(null);
+    isTimerStarted.current = false;
   };
 
   const onSelectAnswer = (answer: string) => {
-    if (selectedAnswer) {
+    if (selectedAnswer || timer === 0) {
       return;
     }
 
+    if (timer > 0) {
+      clearInterval(id.current);
+      console.log("id from onSelectAnswer function", id, id.current);
+    }
+    isTimerStarted.current = true;
     setSelectedAnswer(answer);
   };
 
@@ -68,6 +98,7 @@ const QuizPage = () => {
     localStorage.removeItem("quiz");
     setCurrentQuestionIndex(0);
     setSavedQuizData(quizDataToSave);
+    setTimer(timerLength);
   };
 
   const handleButtonTitle = () =>
@@ -78,6 +109,8 @@ const QuizPage = () => {
   const correctAnswersCount = savedQuizData.filter(
     ({ isAnswerCorrect }: TSavedQuizData) => Boolean(isAnswerCorrect)
   ).length;
+
+  console.log("id from component", id, id.current);
 
   return (
     <div className="quiz">
@@ -128,6 +161,7 @@ const QuizPage = () => {
         <div>
           <ScoreLabel currentQuestionIndex={currentQuestionIndex} />
           <Question currentQuestionIndex={currentQuestionIndex} />
+          <Timer timer={timer} />
           <div className="answers">
             {quiz.length > 0 &&
               quiz[currentQuestionIndex].answers.map(
@@ -135,7 +169,7 @@ const QuizPage = () => {
                   <Answer
                     answer={answer}
                     index={idx}
-                    currentQuestionIndex={currentQuestionIndex}
+                    timer={timer}
                     onSelectAnswer={onSelectAnswer}
                     key={idx}
                     selectedAnswer={selectedAnswer}
@@ -147,7 +181,7 @@ const QuizPage = () => {
           <div className="buttons">
             <Button
               onClick={onSelectNextQuestion}
-              disabled={selectedAnswer === null}
+              disabled={selectedAnswer === null && timer > 0}
               variant="contained"
             >
               {handleButtonTitle()}

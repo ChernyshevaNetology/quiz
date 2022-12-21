@@ -6,7 +6,7 @@ import cn from "classnames";
 
 type TAnswerProps = {
   answer?: string;
-  currentQuestionIndex: number;
+  timer: number;
   index: number;
   onSelectAnswer: (answer: string) => void;
   selectedAnswer: null | string;
@@ -42,34 +42,32 @@ const handleAnswerColor = (
 const Answer = ({
   answer,
   index,
-  currentQuestionIndex,
+  timer,
   onSelectAnswer,
   selectedAnswer,
   correctAnswer,
 }: TAnswerProps) => {
-  // const isCorrectAnswer = currentAnswer && answer === correctAnswer;
-  //
-  // const isWrongAnswer =
-  //   currentAnswer === answer && currentAnswer !== correctAnswer;
-  //
-  // const answerClasses = cn("answer", {
-  //   "correct-answer": isCorrectAnswer,
-  //   "disabled-answer": currentAnswer,
-  //   "wrong-answer": isWrongAnswer,
-  // });
-  console.log("correctAnswer", correctAnswer);
+  const answerClasses = cn("answer-item", {
+    "answer-wrong__highlight": timer === 0,
+  });
+
   return (
-    // @ts-ignore
-    <Stack sx={{ width: "50%" }} onClick={() => onSelectAnswer(answer)}>
+    <Stack
+      sx={{ width: "50%" }}
+      // @ts-ignore
+      onClick={() => onSelectAnswer(answer)}
+    >
       <Alert
-        className={"answer-item"}
+        className={answerClasses}
         icon={false}
         // @ts-ignore
         severity={handleAnswerColor(answer, correctAnswer, selectedAnswer)}
       >
         <Chip
           size="small"
-          className={"answer-letter"}
+          className={cn("answer-letter", {
+            "answer-letter__disabled": timer === 0,
+          })}
           label={letterMapping[index]}
           color="primary"
         />
