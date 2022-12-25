@@ -20,7 +20,7 @@ const quizDataToSave = [...new Array(10)].map((_, idx) => ({
   isAnswerCorrect: null,
 }));
 
-const timerLength = 10;
+const timerLength = 15;
 
 const QuizPage = () => {
   const quiz: IQuestionPrepared[] = useContext(QuizContext);
