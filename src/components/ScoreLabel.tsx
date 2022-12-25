@@ -1,13 +1,14 @@
 import React, { useContext } from "react";
 import Alert from "@mui/material/Alert";
 import { QuizContext } from "../context/QuizContext";
+import { IQuestionPrepared } from "../types/types";
 
 type TScoreLabelProps = {
   currentQuestionIndex: number;
 };
 
 const ScoreLabel = ({ currentQuestionIndex }: TScoreLabelProps) => {
-  const value: any = useContext(QuizContext);
+  const value: IQuestionPrepared[] = useContext(QuizContext);
 
   return (
     <div className="score">

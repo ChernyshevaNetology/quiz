@@ -1,13 +1,6 @@
-interface IQuestion {
-  category: string;
-  correct_answer: string;
-  difficulty: string;
-  incorrect_answers: string[];
-  question: string;
-  type: string;
-}
+import { IQuestionApiProps } from "types/types";
 
-export const shuffleAnswers = (question: IQuestion): string[] => {
+export const shuffleAnswers = (question: IQuestionApiProps): string[] => {
   const unshuffled = [question.correct_answer, ...question.incorrect_answers];
 
   return unshuffled

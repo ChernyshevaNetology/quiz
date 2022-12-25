@@ -1,16 +1,16 @@
-export interface IQuestion {
+export interface IQuestionApiProps {
+  category: string;
+  correct_answer: string;
+  difficulty: string;
+  incorrect_answers: string[];
   question: string;
-  incorrectAnswers: string[];
-  correctAnswer: string;
+  type: string;
 }
 
-export interface IInitialStateProps {
-  questions: IQuestion[] | [];
-  currentQuestionIndex: number;
-  showResults: boolean;
-  answers: string[] | [];
-  currentAnswer: string;
-  correctAnswersCount: number;
+export interface IQuestionPrepared {
+  question: string;
+  answers: string[];
+  correctAnswer: string;
 }
 
 export type TSavedQuizData = {

@@ -6,7 +6,7 @@ import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import { Step } from "components/Step";
 import { ScoreLabel } from "../components/ScoreLabel";
-import { TSavedQuizData } from "types/types";
+import { IQuestionPrepared, TSavedQuizData } from "types/types";
 import { Typography } from "@mui/material";
 import { AnswerResult } from "../components/AnswerResult";
 import Alert from "@mui/material/Alert";
@@ -20,10 +20,11 @@ const quizDataToSave = [...new Array(10)].map((_, idx) => ({
   isAnswerCorrect: null,
 }));
 
-const timerLength = 5;
+const timerLength = 10;
 
 const QuizPage = () => {
-  const quiz: any = useContext(QuizContext);
+  const quiz: IQuestionPrepared[] = useContext(QuizContext);
+  console.log("quiz from quizPage", quiz);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<null | string>(null);
@@ -31,15 +32,15 @@ const QuizPage = () => {
     useState<TSavedQuizData[]>(quizDataToSave);
   const [timer, setTimer] = useState(timerLength);
   const isTimerStarted = useRef(false);
+  const [showResults, setShowResults] = useState(false);
   let id: any = useRef(null);
-  console.log("id", id);
 
   useEffect(() => {
     if (isTimerStarted.current) {
       return;
     }
 
-    if (timer === 0) {
+    if (timer === 0 || showResults) {
       clearInterval(id.current);
       return;
     }
@@ -49,16 +50,21 @@ const QuizPage = () => {
     }, 1000);
 
     return () => clearInterval(id.current);
-  }, [timer, isTimerStarted.current]);
+  }, [timer, isTimerStarted.current, currentQuestionIndex]);
 
   const onSelectNextQuestion = () => {
     const currentIdx =
       currentQuestionIndex >= quiz.length
         ? currentQuestionIndex
         : currentQuestionIndex + 1;
+
     setCurrentQuestionIndex(currentIdx);
+    if (currentIdx === savedQuizData.length) {
+      setShowResults(true);
+      clearInterval(id.current);
+    }
     setTimer(timerLength);
-    const quizDataToUpdate = savedQuizData.map((data: TSavedQuizData) => {
+    const quizDataToUpdate = savedQuizData?.map((data: TSavedQuizData) => {
       if (data.idx === currentQuestionIndex) {
         return {
           question: quiz[currentQuestionIndex].question,
@@ -88,7 +94,6 @@ const QuizPage = () => {
 
     if (timer > 0) {
       clearInterval(id.current);
-      console.log("id from onSelectAnswer function", id, id.current);
     }
     isTimerStarted.current = true;
     setSelectedAnswer(answer);
@@ -99,6 +104,7 @@ const QuizPage = () => {
     setCurrentQuestionIndex(0);
     setSavedQuizData(quizDataToSave);
     setTimer(timerLength);
+    setShowResults(false);
   };
 
   const handleButtonTitle = () =>
@@ -110,8 +116,6 @@ const QuizPage = () => {
     ({ isAnswerCorrect }: TSavedQuizData) => Boolean(isAnswerCorrect)
   ).length;
 
-  console.log("id from component", id, id.current);
-
   return (
     <div className="quiz">
       <div className={"steps"}>
@@ -119,13 +123,12 @@ const QuizPage = () => {
           <Step
             currentQuestionIndex={currentQuestionIndex}
             idx={elem.idx}
-            correctAnswer={elem.correctAnswer}
             isAnswerCorrect={elem.isAnswerCorrect}
           />
         ))}
       </div>
       <Divider />
-      {currentQuestionIndex >= quiz.length ? (
+      {showResults ? (
         <>
           <Alert
             className={"question-info"}

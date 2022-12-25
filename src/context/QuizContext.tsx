@@ -1,23 +1,16 @@
 import { createContext, useEffect, useState } from "react";
 import { shuffleAnswers } from "../helpers";
-import { IInitialStateProps } from "../types/types";
+import { IQuestionApiProps, IQuestionPrepared } from "../types/types";
 
-const initialState: IInitialStateProps = {
-  questions: [],
-  currentQuestionIndex: 0,
-  showResults: false,
-  answers: [],
-  currentAnswer: "",
-  correctAnswersCount: 0,
-};
+const initialState: IQuestionPrepared[] | [] = [];
+
+export const QuizContext = createContext(initialState);
 
 const API_URL =
   "https://opentdb.com/api.php?amount=10&category=11&difficulty=medium&type=multiple&encode=url3986";
 
-export const QuizContext = createContext(initialState);
-
 export const QuizProvider = ({ children }: any) => {
-  const [quizData, setQuizData] = useState([]);
+  const [quizData, setQuizData] = useState(initialState);
 
   useEffect(() => {
     const savedData: string | null = localStorage.getItem("quiz");
@@ -30,23 +23,27 @@ export const QuizProvider = ({ children }: any) => {
     fetch(API_URL)
       .then((res) => res.json())
       .then((data) => {
-        const preparedQuizData = data.results.reduce((acc: any, curr: any) => {
-          return [
-            ...acc,
-            {
-              question: decodeURIComponent(curr.question),
-              correctAnswer: decodeURIComponent(curr.correct_answer),
-              answers: shuffleAnswers(curr),
-            },
-          ];
-        }, []);
+        const preparedQuizData = data.results.reduce(
+          (acc: IQuestionPrepared[], curr: IQuestionApiProps) => {
+            return [
+              ...acc,
+              {
+                question: decodeURIComponent(curr.question),
+                correctAnswer: decodeURIComponent(curr.correct_answer),
+                answers: shuffleAnswers(curr),
+              },
+            ];
+          },
+          []
+        );
         setQuizData(preparedQuizData);
         localStorage.setItem("quiz", JSON.stringify(preparedQuizData));
       });
   }, []);
 
+  console.log("quizDate from context", quizData);
+
   return (
-    // @ts-ignore
     <QuizContext.Provider value={quizData}>{children}</QuizContext.Provider>
   );
 };

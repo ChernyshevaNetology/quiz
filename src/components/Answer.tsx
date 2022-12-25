@@ -5,7 +5,7 @@ import Chip from "@mui/material/Chip";
 import cn from "classnames";
 
 type TAnswerProps = {
-  answer?: string;
+  answer: string;
   timer: number;
   index: number;
   onSelectAnswer: (answer: string) => void;
@@ -20,22 +20,30 @@ const handleAnswerColor = (
   correctAnswer: string,
   selectedAnswer: string | null
 ) => {
-  if (!selectedAnswer) {
-    return "info";
-  }
-
-  if (selectedAnswer === correctAnswer && answer === selectedAnswer) {
+  if (
+    Boolean(selectedAnswer) &&
+    selectedAnswer === correctAnswer &&
+    answer === selectedAnswer
+  ) {
     return "success";
   }
 
   if (selectedAnswer !== correctAnswer && answer === selectedAnswer) {
     return "error";
   }
-
-  if (answer === correctAnswer) {
+  /**
+   * Если ответ выбран неправильно
+   * подсвечиваем правильный ответ зеленым, если же
+   * ответ не был выбран - цвет правильного ответа остается дефолтный
+   */
+  if (answer === correctAnswer && Boolean(selectedAnswer)) {
     return "success";
   }
 
+  /**
+   * Если ответ не выбран, все ответы помечены цветом info
+   * дефолтный цвет
+   */
   return "info";
 };
 
@@ -52,15 +60,10 @@ const Answer = ({
   });
 
   return (
-    <Stack
-      sx={{ width: "50%" }}
-      // @ts-ignore
-      onClick={() => onSelectAnswer(answer)}
-    >
+    <Stack sx={{ width: "50%" }} onClick={() => onSelectAnswer(answer)}>
       <Alert
         className={answerClasses}
         icon={false}
-        // @ts-ignore
         severity={handleAnswerColor(answer, correctAnswer, selectedAnswer)}
       >
         <Chip
